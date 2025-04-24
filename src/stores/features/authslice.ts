@@ -88,7 +88,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Registration failed";
+        state.error=action.payload as string
       })
   
       // Login user
@@ -108,7 +108,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Login failed";
+        state.error=action.payload as string
       })
   
       // Get Current User
@@ -128,7 +128,7 @@ const authSlice = createSlice({
       })
       .addCase(GetCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch current user";
+        state.error=action.payload as string
       })
   
       // Update Password
@@ -141,7 +141,7 @@ const authSlice = createSlice({
       })
       .addCase(newpass.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Password update failed";
+        state.error=action.payload as string
       });
   }
 });
