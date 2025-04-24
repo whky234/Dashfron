@@ -1,8 +1,11 @@
 import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
-const Api_Url = "http://localhost:3000/api/auth";
-
+// Automatically choose base URL based on environment
+const Api_Url =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api/auth"
+    : "https://backend-green-seven-65.vercel.app/api/auth";
 export const registeruser = async (userData: {
   name: string;
   email: string;

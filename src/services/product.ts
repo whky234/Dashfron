@@ -1,8 +1,12 @@
 import axios from "axios";
 import { Product } from "../Types/Product";
-const Api_Url="http://localhost:3000/api/product";
+// const Api_Url="http://localhost:3000/api/product";
 
-
+// Automatically choose base URL based on environment
+const Api_Url =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api/product"
+    : "https://backend-green-seven-65.vercel.app/api/product";
 export const getproduct=async()=>{
 return await axios.get(`${Api_Url}/getProduct`,{    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 })
