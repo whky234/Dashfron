@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isTokenExpired } from "../../utils/tokenutils";
+import { GetCurrentUser, login, newpass, register } from "./auththunk";
 
 interface AuthState {
   user: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -68,6 +69,81 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      // Register user
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = {
+          _id: action.payload._id,
+          name: action.payload.name,
+          email: action.payload.email,
+          role: action.payload.role,
+        };
+        state.token = action.payload.token;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Registration failed";
+      })
+  
+      // Login user
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = {
+          _id: action.payload._id,
+          name: action.payload.name,
+          email: action.payload.email,
+          role: action.payload.role,
+        };
+        state.token = action.payload.token;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Login failed";
+      })
+  
+      // Get Current User
+      .addCase(GetCurrentUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(GetCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = {
+          _id: action.payload._id,
+          name: action.payload.name,
+          email: action.payload.email,
+          role: action.payload.role,
+        };
+        state.token = action.payload.token;
+      })
+      .addCase(GetCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch current user";
+      })
+  
+      // Update Password
+      .addCase(newpass.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(newpass.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(newpass.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Password update failed";
+      });
+  }
 });
 
 export const { setCredentials, logout, setError, setLoading } =
