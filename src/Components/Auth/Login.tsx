@@ -11,6 +11,7 @@ import {
   Alert,
   Box,
   Paper,
+  Snackbar,
 } from "@mui/material";
 import { login } from "../../stores/features/auththunk";
 import { RootState } from "../../stores/store";
@@ -18,27 +19,31 @@ import { RootState } from "../../stores/store";
 export const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [success, setSuccess] = useState<boolean>(false);
+  // const [success] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, user } = useSelector((state: RootState) => state.auth);
+  const { loading, user } = useSelector((state: RootState) => state.auth);
+    const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(login({ email, password }) as any)
-      .unwrap()
-      .then(() => {
-        setSuccess(true);
+    const result=dispatch(login({ email, password }) as any)
+        
+           if (login.fulfilled.match(result)) {
+                setSnackbar({ message: result.payload.message, severity: 'success' });
+              } else {
+                setSnackbar({ message: result.payload as string, severity: 'error' });
+              }
+       
         if (user?.role === "admin") {
           navigate("/admin");
         } else {
           navigate("/user");
         }
-      })
-      .catch(() => {
-        // error handled in thunk
-      });
+     
+      
+      
   };
 
   return (
@@ -59,16 +64,7 @@ export const Login: React.FC = () => {
             Please login to your account
           </Typography>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              Login successful!
-            </Alert>
-          )}
+          
 
           <form onSubmit={handleSubmit}>
             <TextField
@@ -114,6 +110,21 @@ export const Login: React.FC = () => {
             </Box>
           </form>
         </Paper>
+
+         <Snackbar
+                            open={!!snackbar}
+                            autoHideDuration={3000}
+                            onClose={() => setSnackbar(null)}
+                            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                          >
+                            <Alert
+                              onClose={() => setSnackbar(null)}
+                              severity={snackbar?.severity}
+                              sx={{ width: "100%" }}
+                            >
+                              {snackbar?.message}
+                            </Alert>
+                          </Snackbar>
       </Container>
   );
 };

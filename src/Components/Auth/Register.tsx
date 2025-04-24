@@ -10,10 +10,12 @@ import {
   Alert,
   Paper,
   // Box,
+
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
 } from "@mui/material";
 import { register } from "../../stores/features/auththunk";
 import { RootState } from "../../stores/store";
@@ -24,11 +26,12 @@ export const Register: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<string>("user");
-  const [success, setSuccess] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
+    const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
+  
 
   // Clear error after 2 seconds
   useEffect(() => {
@@ -44,16 +47,17 @@ export const Register: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dispatch(register({ name, email, password, role }) as any)
-      .unwrap()
-      .then(() => {
-        setSuccess(true);
+    const result=dispatch(register({ name, email, password, role }) as any)
+      
+     if (register.fulfilled.match(result)) {
+          setSnackbar({ message: result.payload.message, severity: 'success' });
+        } else {
+          setSnackbar({ message: result.payload as string, severity: 'error' });
+        }
         setTimeout(() => {
           navigate("/login");
-        }, 2000);
-      })
-      .catch(() => {
-        // Error is already handled by the thunk
+
+     
       });
   };
 
@@ -75,16 +79,8 @@ export const Register: React.FC = () => {
                 Please Register to your account
               </Typography>
     
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
-              {success && (
-                <Alert severity="success" sx={{ mb: 2 }}>
-               Registration successful! Redirecting...
-    </Alert>
-              )}
+              
+              
     
               <form onSubmit={handleSubmit}>
              <TextField
@@ -144,7 +140,25 @@ export const Register: React.FC = () => {
            </Button>
               </form>
             </Paper>
+
+            <Snackbar
+                    open={!!snackbar}
+                    autoHideDuration={3000}
+                    onClose={() => setSnackbar(null)}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <Alert
+                      onClose={() => setSnackbar(null)}
+                      severity={snackbar?.severity}
+                      sx={{ width: "100%" }}
+                    >
+                      {snackbar?.message}
+                    </Alert>
+                  </Snackbar>
+            
           </Container>
+
+          
     // <Box
     //   sx={{
     //     display: "flex",
