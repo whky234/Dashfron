@@ -9,8 +9,6 @@ import {
   CircularProgress,
   Alert,
   Paper,
-  // Box,
-
   FormControl,
   InputLabel,
   MenuItem,
@@ -18,7 +16,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import { register } from "../../stores/features/auththunk";
-import { RootState } from "../../stores/store";
+import { RootState, AppDispatch } from "../../stores/store";
 import { setError } from "../../stores/features/authslice";
 
 export const Register: React.FC = () => {
@@ -26,12 +24,11 @@ export const Register: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<string>("user");
+  const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
-    const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
-  
 
   // Clear error after 2 seconds
   useEffect(() => {
@@ -44,47 +41,44 @@ export const Register: React.FC = () => {
     }
   }, [error, dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result=dispatch(register({ name, email, password, role }) as any)
-      
-     if (register.fulfilled.match(result)) {
-          setSnackbar({ message: result.payload.message, severity: 'success' });
-        } else {
-          setSnackbar({ message: result.payload as string, severity: 'error' });
-        }
-        setTimeout(() => {
-          navigate("/login");
 
-     
-      });
+    try {
+      const result = await dispatch(register({ name, email, password, role }));
+
+      if (register.fulfilled.match(result)) {
+        setSnackbar({ message: result.payload.message, severity: "success" });
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setSnackbar({ message: result.payload as string, severity: "error" });
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setSnackbar({ message: "Registration failed", severity: "error" });
+    }
   };
 
   return (
-
     <Container maxWidth="sm">
-            <Paper
-              elevation={2}
-              sx={{
-                p: { xs: 3, sm: 4 },
-                borderRadius: 3,
-                backgroundColor: "rgba(255,255,255,0.95)",
-              }}
-            >
-              <Typography variant="h4" align="center" gutterBottom>
-                Welcome  👋
-              </Typography>
-              <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
-                Please Register to your account
-              </Typography>
-    
-              
-              
-    
-              <form onSubmit={handleSubmit}>
-             <TextField
-             label="Name"
+      <Paper
+        elevation={2}
+        sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
+          backgroundColor: "rgba(255,255,255,0.95)",
+        }}
+      >
+        <Typography variant="h4" align="center" gutterBottom>
+          Welcome 👋
+        </Typography>
+        <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
+          Please Register to your account
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Name"
             size="small"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -92,39 +86,38 @@ export const Register: React.FC = () => {
             margin="normal"
             required
             sx={{ mb: 2 }}
-           /> 
-                <TextField
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  margin="normal"
-                  size="small"
-                  required
-                />
-                <TextField
-                  label="Password"
-                  type="password"
-                  fullWidth
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  margin="normal"
-                  size="small"
-                  required
-                  sx={{ mb: 3 }}
-                />
-    
-                <FormControl fullWidth margin="normal" required sx={{ mb: 3 }}>
-           <InputLabel id="role-label">Role</InputLabel>
-      <Select
-           labelId="role-label"
-             label="Role"
-             value={role}
-             onChange={(e) => setRole(e.target.value as string)}
+          />
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            margin="normal"
             size="small"
-          >
-            <MenuItem value="user">User</MenuItem>
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+            size="small"
+            required
+            sx={{ mb: 3 }}
+          />
+          <FormControl fullWidth margin="normal" required sx={{ mb: 3 }}>
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              label="Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value as string)}
+              size="small"
+            >
+              <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
             </Select>
           </FormControl>
@@ -137,119 +130,24 @@ export const Register: React.FC = () => {
             sx={{ py: 1.5 }}
           >
             {loading ? <CircularProgress size={24} /> : "Register"}
-           </Button>
-              </form>
-            </Paper>
+          </Button>
+        </form>
+      </Paper>
 
-            <Snackbar
-                    open={!!snackbar}
-                    autoHideDuration={3000}
-                    onClose={() => setSnackbar(null)}
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <Alert
-                      onClose={() => setSnackbar(null)}
-                      severity={snackbar?.severity}
-                      sx={{ width: "100%" }}
-                    >
-                      {snackbar?.message}
-                    </Alert>
-                  </Snackbar>
-            
-          </Container>
-
-          
-    // <Box
-    //   sx={{
-    //     display: "flex",
-    //     alignItems: "center",
-    //     justifyContent: "center",
-    //     minHeight: "100%",
-    //     // backgroundColor: "#f5f5f5", // Light background for the page
-    //   }}
-    // >
-    //   <Container maxWidth="xs">
-    //     <Paper
-    //       elevation={6}
-    //       sx={{
-    //         padding: 4,
-    //         borderRadius: 2,
-    //         backgroundColor: "rgba(249, 230, 192, 0.29)", // Semi-transparent white
-    //         boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-    //       }}
-    //     >
-    //       <Typography variant="h4" align="center" gutterBottom>
-    //         Register
-    //       </Typography>
-    //       {error && (
-    //         <Alert severity="error" sx={{ mb: 2 }}>
-    //           {error}
-    //         </Alert>
-    //       )}
-    //       {success && (
-    //         <Alert severity="success" sx={{ mb: 2 }}>
-    //           Registration successful! Redirecting...
-    //         </Alert>
-    //       )}
-    //       <form onSubmit={handleSubmit}>
-    //         <TextField
-    //           label="Name"
-    //           size="small"
-    //           value={name}
-    //           onChange={(e) => setName(e.target.value)}
-    //           fullWidth
-    //           margin="normal"
-    //           required
-    //           sx={{ mb: 2 }}
-    //         />
-    //         <TextField
-    //           label="Email"
-    //           size="small"
-    //           type="email"
-    //           value={email}
-    //           onChange={(e) => setEmail(e.target.value)}
-    //           fullWidth
-    //           margin="normal"
-    //           required
-    //           sx={{ mb: 2 }}
-    //         />
-    //         <TextField
-    //           label="Password"
-    //           size="small"
-    //           type="password"
-    //           value={password}
-    //           onChange={(e) => setPassword(e.target.value)}
-    //           fullWidth
-    //           margin="normal"
-    //           required
-    //           sx={{ mb: 2 }}
-    //         />
-    //        <FormControl fullWidth margin="normal" required sx={{ mb: 3 }}>
-    //           <InputLabel id="role-label">Role</InputLabel>
-    //           <Select
-    //             labelId="role-label"
-    //             label="Role"
-    //             value={role}
-    //             onChange={(e) => setRole(e.target.value as string)}
-    //             size="small"
-    //           >
-    //             <MenuItem value="user">User</MenuItem>
-    //             <MenuItem value="admin">Admin</MenuItem>
-    //           </Select>
-    //         </FormControl>
-    //         <Button
-    //           type="submit"
-    //           variant="contained"
-    //           color="primary"
-    //           fullWidth
-    //           disabled={loading}
-    //           sx={{ py: 1.5 }}
-    //         >
-    //           {loading ? <CircularProgress size={24} /> : "Register"}
-    //         </Button>
-    //       </form>
-    //     </Paper>
-    //   </Container>
-    // </Box>
+      <Snackbar
+        open={!!snackbar}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbar(null)}
+          severity={snackbar?.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar?.message}
+        </Alert>
+      </Snackbar>
+    </Container>
   );
 };

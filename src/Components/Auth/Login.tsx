@@ -14,35 +14,37 @@ import {
   Snackbar,
 } from "@mui/material";
 import { login } from "../../stores/features/auththunk";
-import { RootState } from "../../stores/store";
+import { RootState, AppDispatch } from "../../stores/store";
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  // const [success] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, user } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
+
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = dispatch(login({ email, password }) as any);
+    try {
+      const result = await dispatch(login({ email, password })).unwrap();
+      setSnackbar({ message: "Login successful!", severity: "success" });
 
-    if (login.fulfilled.match(result)) {
-      setSnackbar({ message: result.payload.message, severity: "success" });
-    } else {
-      setSnackbar({ message: result.payload as string, severity: "error" });
-    }
-
-    if (user?.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/user");
+      if (result.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/user");
+      }
+    } catch (err: any) {
+      setSnackbar({
+        message: err?.message || "Login failed!",
+        severity: "error",
+      });
     }
   };
 
@@ -119,7 +121,7 @@ export const Login: React.FC = () => {
       </Paper>
 
       <Snackbar
-        open={!!snackbar}
+        open={!!snackbar?.message}
         autoHideDuration={3000}
         onClose={() => setSnackbar(null)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
