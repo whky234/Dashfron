@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// const API_URL = 'http://localhost:3000/api/profile';
-const API_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000/api/profile"
-    : "https://backend-green-seven-65.vercel.app/api/profile";
+const API_URL = 'http://localhost:3000/api/profile';
+
 export interface Profile {
     userId?: string;
     username?: string;
