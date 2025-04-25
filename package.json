@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+"build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "serve -s build",
-     "heroku-postbuild": "npm install && npm run build"
-
+    "heroku-postbuild": "npm install && npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,7 +28,6 @@
     "recharts": "^2.15.2",
     "serve": "^14.2.4",
     "vite": "^4.0.0"
-
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -45,7 +43,6 @@
     "vite": "^6.2.0"
   },
   "engines": {
-  "node": "20.x"
-}
-
+    "node": "20.x"
+  }
 }
