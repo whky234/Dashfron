@@ -17,9 +17,12 @@ export const loginuser = async (credentials: {
   email: string;
   password: string;
 }) => {
-  const response = await axios.post(`${Api_Url}/login`, credentials);
+  const response = await axios.post(`${Api_Url}/login`, credentials, {
+    withCredentials: true,
+  });
   return response.data;
 };
+
 
 export const newpassword = async (credentials: {
   currentPassword: string;
