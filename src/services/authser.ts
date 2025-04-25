@@ -1,7 +1,7 @@
 import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
-const Api_Url = "https://backend-green-seven-65.vercel.app/api/auth";
+const Api_Url = "http://localhost:3000/api/auth";
 
 export const registeruser = async (userData: {
   name: string;
@@ -17,12 +17,9 @@ export const loginuser = async (credentials: {
   email: string;
   password: string;
 }) => {
-  const response = await axios.post(`${Api_Url}/login`, credentials, {
-    withCredentials: true,
-  });
+  const response = await axios.post(`${Api_Url}/login`, credentials);
   return response.data;
 };
-
 
 export const newpassword = async (credentials: {
   currentPassword: string;
