@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npx tsc -b && vite build",
-        "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "serve -s build",
-    "heroku-postbuild": "npm install && npm run build"
-  },
+    "heroku-postbuild": "npm install typescript && npm install && npm run build",
+
+  "dev": "vite",
+  "build": "npx tsc -b && vite build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "start": "serve -s build",
+},
+
   "dependencies": {
   "@emotion/react": "^11.14.0",
   "@emotion/styled": "^11.14.0",
