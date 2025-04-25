@@ -1,7 +1,7 @@
 import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
-const Api_Url = "https://backend-green-seven-65.vercel.app/api/auth";
+const Api_Url = "http://localhost:3000/api/auth";
 
 export const registeruser = async (userData: {
   name: string;
