@@ -1,7 +1,7 @@
 import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
-const Api_Url = "http://localhost:3000/api/auth";
+const Api_Url = "https://imaginative-empanada-3e372f.netlify.app/api/auth";
 
 export const registeruser = async (userData: {
   name: string;
