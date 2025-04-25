@@ -7,7 +7,7 @@
     "heroku-postbuild": "npm install typescript && npm install && npm run build",
 
   "dev": "vite",
-  "build": "npx tsc -b && vite build",
+  "build": "npx tsc && vite build",
   "lint": "eslint .",
   "preview": "vite preview",
   "start": "serve -s build"
