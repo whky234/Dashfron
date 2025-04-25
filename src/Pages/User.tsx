@@ -94,12 +94,12 @@ const User: React.FC = () => {
       <Box
         sx={{
           mt: 10, // Push below AppBar
-          p: 3,
-          flexGrow: 1, // Allow content to take full height
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-start", // Left-align content
-          alignItems:'flex-start'
+          // p: 3,
+          // flexGrow: 1, // Allow content to take full height
+          // width: "100%",
+          // display: "flex",
+          // justifyContent: "flex-start", // Left-align content
+          // alignItems:'flex-start'
         }}
       >
         <Outlet />

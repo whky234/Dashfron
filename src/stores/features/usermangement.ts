@@ -38,7 +38,8 @@ export const Fetchuser = createAsyncThunk(
 
   export const Adduser = createAsyncThunk(
     'users/Adduser',
-    async (userData:{name:string,email:string,role:string}, { rejectWithValue }) => { // `_` is used because we don't need an argument
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (userData:any, { rejectWithValue }) => { // `_` is used because we don't need an argument
       try {
         return await adduser(userData);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

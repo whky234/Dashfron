@@ -27,10 +27,7 @@ const AddUser: React.FC = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
   const [status, setStatus] = useState("active");
-  // const [error, setError] = useState("");
-  // const [success, setSuccess] = useState("");
-    const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
-  
+  const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
 
   const { users } = useSelector((state: RootState) => state.userManagement);
   const existingUser = id ? users.find((user) => user._id === id) : null;
@@ -47,9 +44,7 @@ const AddUser: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
     if (!name || !email || !role) {
-      // setError("Please fill in all fields");
       return;
     }
 
@@ -57,158 +52,101 @@ const AddUser: React.FC = () => {
       let resultAction;
 
       if (id) {
-        // Edit existing user
+        // Edit user
         resultAction = await dispatch(
           Edituser({
             id,
-            userData: {
-              name,
-              email,
-              role,
-              status,
-            },
+            userData: { name, email, role, status },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any
         );
-
-          if(Edituser.fulfilled.match(resultAction)){
-            setSnackbar({ message: resultAction.payload.message, severity: 'success' });
-
-          }else{
-            setSnackbar({ message: resultAction.payload as string, severity: 'error' });
-
-          }
-       
       } else {
-        // Add new user
+        // Add user
         resultAction = await dispatch(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           Adduser({ name, email, role }) as any
         );
-
-        if(Edituser.fulfilled.match(resultAction)){
-          setSnackbar({ message: resultAction.payload.message, severity: 'success' });
-
-        }else{
-          setSnackbar({ message: resultAction.payload as string, severity: 'error' });
-
-        }
       }
 
-      
+      if (
+        (id && Edituser.fulfilled.match(resultAction)) ||
+        (!id && Adduser.fulfilled.match(resultAction))
+      ) {
+        setSnackbar({ message: resultAction.payload.message, severity: 'success' });
+
+        setTimeout(() => {
+          navigate("/admin/users");
+        }, 1500); // Delay navigation to allow Snackbar to show
+      } else {
+        setSnackbar({ message: resultAction.payload as string, severity: 'error' });
+      }
 
       setName("");
       setEmail("");
       setRole("user");
       setStatus("active");
 
-      setTimeout(() => {
-        navigate("/admin/users");
-      }, 1500);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     } catch (err: any) {
-      //
+      setSnackbar({ message: "An error occurred", severity: 'error' });
     }
   };
 
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "70vh",
-      }}
-    >
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
       <Paper elevation={3} sx={{ padding: 4, width: "100%", maxWidth: 600 }}>
         <Typography variant="h5" align="center" gutterBottom>
           {id ? "Edit User" : "Add New User"}
         </Typography>
-
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
-                label="Name"
-                fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <TextField label="Name" fullWidth value={name} onChange={(e) => setName(e.target.value)} required />
             </Grid>
-
             <Grid item xs={12}>
-              <TextField
-                label="Email"
-                type="email"
-                fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <TextField label="Email" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} required />
             </Grid>
-
             <Grid item xs={12}>
               <FormControl fullWidth required>
                 <InputLabel id="role-label">Role</InputLabel>
-                <Select
-                  labelId="role-label"
-                  label="Role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
+                <Select labelId="role-label" value={role} onChange={(e) => setRole(e.target.value)}>
                   <MenuItem value="user">User</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-
-           
-              <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel id="status-label">Status</InputLabel>
-                  <Select
-                    labelId="status-label"
-                    label="Status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="pending">Pending</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-           
-
-           
             <Grid item xs={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-              >
+              <FormControl fullWidth required>
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select labelId="status-label" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Button type="submit" variant="contained" color="primary" fullWidth>
                 {id ? "Update User" : "Add User"}
               </Button>
             </Grid>
           </Grid>
         </form>
       </Paper>
-
-      <Snackbar
-              open={!!snackbar}
-              autoHideDuration={3000}
-              onClose={() => setSnackbar(null)}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert
-                onClose={() => setSnackbar(null)}
-                severity={snackbar?.severity}
-                sx={{ width: "100%" }}
-              >
-                {snackbar?.message}
-              </Alert>
-            </Snackbar>
+     <Snackbar
+             open={!!snackbar}
+             autoHideDuration={3000}
+             onClose={() => setSnackbar(null)}
+             anchorOrigin={{ vertical: "top", horizontal: "right" }}
+           >
+             <Alert
+               onClose={() => setSnackbar(null)}
+               severity={snackbar?.severity}
+               sx={{ width: "100%" }}
+             >
+               {snackbar?.message}
+             </Alert>
+           </Snackbar>
     </Box>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import {
   Box,
@@ -15,6 +16,7 @@ import {
   TablePagination,
   TextField,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -22,17 +24,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 type Column = {
   label: string;
   field: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render?: (row: any) => React.ReactNode;
   align?: "left" | "center" | "right";
 };
 
 type Action = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: React.ReactNode | ((row: any) => React.ReactNode);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   label: string | ((row: any) => string);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick: (row: any) => void;
 };
 
@@ -44,7 +42,6 @@ type ReusableTableProps = {
   addButtonLabel?: string;
   addButtonIcon?: React.ReactNode;
   columns: Column[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: any[];
   page: number;
   rowsPerPage: number;
@@ -53,6 +50,9 @@ type ReusableTableProps = {
   totalCount?: number;
   actions?: Action[];
 };
+
+
+
 
 const ReusableTable: React.FC<ReusableTableProps> = ({
   searchTerm,
@@ -66,8 +66,8 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  totalCount,
-  actions,
+  totalCount = 0,
+  actions = [],
 }) => {
   const [menuAnchor, setMenuAnchor] = useState<{
     [key: string]: HTMLElement | null;
@@ -128,28 +128,33 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
             <TableRow>
               {columns.map((col) => (
                 <TableCell
-                  key={col.label}
+                  key={col.field}
                   align={col.align || "left"}
                   sx={{ fontWeight: "bold" }}
                 >
                   {col.label}
                 </TableCell>
               ))}
-              {actions && <TableCell align="center">Actions</TableCell>}
+              {actions.length > 0 && (
+                <TableCell align="center">Actions</TableCell>
+              )}
             </TableRow>
           </TableHead>
 
           <TableBody>
             {rows.length > 0 ? (
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rows.map((row: any) => (
-                <TableRow key={row._id} hover>
+              rows.map((row) => (
+                <TableRow key={row._id || row.id || JSON.stringify(row)} hover>
                   {columns.map((col) => (
-                    <TableCell key={col.label} align={col.align || "center"}>
-                      {col.render ? col.render(row) : row[col.field]}
+                    <TableCell key={col.field} align={col.align || "left"}>
+                      {col.render
+                        ? col.render(row)
+                        : typeof row[col.field] === "object"
+                        ? JSON.stringify(row[col.field])
+                        : String(row[col.field])}
                     </TableCell>
                   ))}
-                  {actions && (
+                  {actions.length > 0 && (
                     <TableCell align="center">
                       <IconButton onClick={(e) => handleMenuClick(e, row._id)}>
                         <MoreVertIcon />
@@ -167,13 +172,25 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
                               action.onClick(row);
                             }}
                           >
-                            {typeof action.icon === "function"
-                              ? action.icon(row)
-                              : action.icon}
-                            &nbsp;
-                            {typeof action.label === "function"
-                              ? action.label(row)
-                              : action.label}
+                            <Tooltip
+                              title={
+                                typeof action.label === "function"
+                                  ? action.label(row)
+                                  : action.label
+                              }
+                              arrow
+                            >
+                              <Box display="flex" alignItems="center" gap={1}>
+                                {typeof action.icon === "function"
+                                  ? action.icon(row)
+                                  : action.icon}
+                                <span>
+                                  {typeof action.label === "function"
+                                    ? action.label(row)
+                                    : action.label}
+                                </span>
+                              </Box>
+                            </Tooltip>
                           </MenuItem>
                         ))}
                       </Menu>
@@ -184,7 +201,7 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + (actions ? 1 : 0)}
+                  colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
                   align="center"
                 >
                   <Typography variant="body1" color="textSecondary">
@@ -199,10 +216,10 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
 
       <TablePagination
         component="div"
-        count={totalCount ?? 0}
-        page={page ?? 0}
+        count={totalCount}
+        page={page}
         onPageChange={onPageChange}
-        rowsPerPage={rowsPerPage ?? 5}
+        rowsPerPage={rowsPerPage}
         onRowsPerPageChange={onRowsPerPageChange}
         rowsPerPageOptions={[5, 10, 25]}
       />
