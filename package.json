@@ -10,7 +10,7 @@
   "build": "npx tsc -b && vite build",
   "lint": "eslint .",
   "preview": "vite preview",
-  "start": "serve -s build",
+  "start": "serve -s build"
 },
 
   "dependencies": {
