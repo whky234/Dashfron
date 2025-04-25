@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "heroku-postbuild": "npm install typescript && npm install && npm run build && npx tsc --version",
+"heroku-postbuild": "npm install && npm install typescript && npm run build",
     "dev": "vite",
-    "build": "npx tsc && vite build",
+"build": "node_modules/.bin/tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "serve -s build"
