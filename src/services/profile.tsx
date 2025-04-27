@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/profile';
+// const API_URL = 'http://localhost:3000/api/profile';
+const API_URL  = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/profile";
 
 export interface Profile {
     userId?: string;
