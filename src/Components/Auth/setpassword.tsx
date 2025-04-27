@@ -24,7 +24,7 @@ const SetPassword: React.FC = () => {
 
     try {
       // Send the token and new password to the backend
-      const response = await axios.post("http://localhost:3000/api/auth/set-password", {
+      const response = await axios.post("https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth/set-password", {
         token,
         password,
       });
