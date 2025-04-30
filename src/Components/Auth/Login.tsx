@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,6 +14,10 @@ import {
   Snackbar,
 } from "@mui/material";
 import { login } from "../../stores/features/auththunk";
+import {
+  setError,
+  setSuccess,
+} from "../../stores/features/authslice"; // ✅ Add this
 import { RootState, AppDispatch } from "../../stores/store";
 
 export const Login: React.FC = () => {
@@ -22,7 +26,9 @@ export const Login: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const { loading, error, success, user } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const [snackbar, setSnackbar] = useState<{
     message: string;
@@ -31,22 +37,30 @@ export const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const result = await dispatch(login({ email, password })).unwrap();
-      setSnackbar({ message: "Login successful!", severity: "success" });
+    await dispatch(login({ email, password }));
+  };
 
-      if (result.role === "admin") {
+  // 🔔 Show snackbar when success or error changes
+  useEffect(() => {
+    if (success) {
+      setSnackbar({ message: success, severity: "success" });
+      dispatch(setSuccess(null)); // reset success after showing it
+    } else if (error) {
+      setSnackbar({ message: error, severity: "error" });
+      dispatch(setError(null)); // reset error after showing it
+    }
+  }, [success, error, dispatch]);
+
+  // 🎯 Redirect if logged in
+  useEffect(() => {
+    if (user) {
+      if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/user");
       }
-    } catch (err: any) {
-      setSnackbar({
-        message: err?.message || "Login failed!",
-        severity: "error",
-      });
     }
-  };
+  }, [user, navigate]);
 
   return (
     <Container maxWidth="sm">

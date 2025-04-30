@@ -1,44 +1,66 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../stores/store";
+import { setError, setSuccess } from "../../stores/features/authslice";
 
 const SetPassword: React.FC = () => {
-  const [searchParams] = useSearchParams(); // Access query parameters
-  const token = searchParams.get("token"); // Get the token from the URL
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [snackbar, setSnackbar] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
+
+  const { success, error } = useSelector((state: RootState) => state.auth);
+
+  // Show snackbar based on Redux feedback
+  useEffect(() => {
+    if (success) {
+      setSnackbar({ message: success, severity: "success" });
+      dispatch(setSuccess(null));
+      setTimeout(() => navigate("/login"), 2000);
+    } else if (error) {
+      setSnackbar({ message: error, severity: "error" });
+      dispatch(setError(null));
+    }
+  }, [success, error, dispatch, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate password and confirm password
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setSnackbar({ message: "Passwords do not match", severity: "error" });
       return;
     }
 
     try {
-      // Send the token and new password to the backend
-      const response = await axios.post("https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth/set-password", {
-        token,
-        password,
-      });
+      const response = await axios.post(
+        "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth/set-password",
+        { token, password }
+      );
 
-      setMessage(response.data.message);
-      setError("");
-
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
+      dispatch(setSuccess(response.data.message));
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to set password");
-      setMessage("");
+      dispatch(
+        setError(err.response?.data?.message || "Failed to set password")
+      );
     }
   };
 
@@ -75,16 +97,6 @@ const SetPassword: React.FC = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
-            </Typography>
-          )}
-          {message && (
-            <Typography color="primary" sx={{ mt: 2 }}>
-              {message}
-            </Typography>
-          )}
           <Button
             type="submit"
             variant="contained"
@@ -96,6 +108,21 @@ const SetPassword: React.FC = () => {
           </Button>
         </form>
       </Paper>
+
+      <Snackbar
+        open={!!snackbar}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbar(null)}
+          severity={snackbar?.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar?.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

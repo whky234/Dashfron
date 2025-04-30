@@ -17,47 +17,41 @@ import {
 } from "@mui/material";
 import { register } from "../../stores/features/auththunk";
 import { RootState, AppDispatch } from "../../stores/store";
-import { setError } from "../../stores/features/authslice";
+import { setError, setSuccess } from "../../stores/features/authslice";
 
 export const Register: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<string>("user");
-  const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
+
+  const [snackbar, setSnackbar] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
-
-  // Clear error after 2 seconds
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        dispatch(setError(null));
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [error, dispatch]);
+  const { loading, error, success } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    try {
-      const result = await dispatch(register({ name, email, password, role }));
-
-      if (register.fulfilled.match(result)) {
-        setSnackbar({ message: result.payload.message, severity: "success" });
-        setTimeout(() => navigate("/login"), 1500);
-      } else {
-        setSnackbar({ message: result.payload as string, severity: "error" });
-      }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setSnackbar({ message: "Registration failed", severity: "error" });
-    }
+    await dispatch(register({ name, email, password, role }));
   };
+
+  // 🔔 Handle success/error updates from Redux
+  useEffect(() => {
+    if (success) {
+      setSnackbar({ message: success, severity: "success" });
+      dispatch(setSuccess(null));
+      setTimeout(() => navigate("/login"), 2000);
+    } else if (error) {
+      setSnackbar({ message: error, severity: "error" });
+      dispatch(setError(null));
+    }
+  }, [success, error, dispatch, navigate]);
 
   return (
     <Container maxWidth="sm">
@@ -73,7 +67,7 @@ export const Register: React.FC = () => {
           Welcome 👋
         </Typography>
         <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
-          Please Register to your account
+          Please register your account
         </Typography>
 
         <form onSubmit={handleSubmit}>
@@ -114,7 +108,7 @@ export const Register: React.FC = () => {
               labelId="role-label"
               label="Role"
               value={role}
-              onChange={(e) => setRole(e.target.value as string)}
+              onChange={(e) => setRole(e.target.value)}
               size="small"
             >
               <MenuItem value="user">User</MenuItem>

@@ -2,6 +2,8 @@ import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
 const Api_Url = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth";
+// const Api_Url = "http://localhost:3000/api/auth";
+
 
 export const registeruser = async (userData: {
   name: string;
