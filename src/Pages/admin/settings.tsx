@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Stack,
-  Paper,
   Snackbar,
   Alert,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
 import { newpass } from "../../stores/features/auththunk";
+import PaperWrapper from "./paper";
+import Whitetextfield from "./whiteTextfield";
 
 const Setting: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -64,14 +64,14 @@ const Setting: React.FC = () => {
   };
 
   return (
-    <Paper elevation={6} sx={{ maxWidth: 500, mx: "auto", p: 5 }}>
+    <PaperWrapper  sx={{ maxWidth: 400, mx: "auto", p: 9 }}>
       <Typography variant="h5" gutterBottom>
         🔐 Change Password
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          <TextField
+          <Whitetextfield
             label="Current Password"
             type="password"
             name="currentPassword"
@@ -80,7 +80,7 @@ const Setting: React.FC = () => {
             required
             fullWidth
           />
-          <TextField
+          <Whitetextfield
             label="New Password"
             type="password"
             name="newPassword"
@@ -89,7 +89,7 @@ const Setting: React.FC = () => {
             required
             fullWidth
           />
-          <TextField
+          <Whitetextfield
             label="Confirm New Password"
             type="password"
             name="confirmPassword"
@@ -138,7 +138,7 @@ const Setting: React.FC = () => {
     </Alert>
   </Snackbar>
 )}
-    </Paper>
+    </PaperWrapper>
   );
 };
 

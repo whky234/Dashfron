@@ -38,7 +38,6 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose, variant }) => {
   );
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const location = useLocation();
-
   const toggleUserMenu = () => {
     setUserMenuOpen((prev) => !prev);
   };
@@ -46,8 +45,8 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose, variant }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const drawerWidth = 250;
-  const sidebarBg = "#1E293B";
-  const activeBg = "#334155";
+  const sidebarBg = "#222831";
+  const activeBg = "#077A7D";
 
   return (
     <Drawer

@@ -13,9 +13,12 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
-import { setError, setSuccess } from "../../stores/features/authslice";
-
-const SetPassword: React.FC = () => {
+import { clearMessages, setError, setMessage } from "../../stores/features/authslice";
+import Handlemessages from "../../hooks/Handlemessage";
+interface setpasswordprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+const SetPassword: React.FC<setpasswordprops> = ({setSnackBar}) => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
@@ -23,30 +26,24 @@ const SetPassword: React.FC = () => {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [snackbar, setSnackbar] = useState<{
-    message: string;
-    severity: "success" | "error";
-  } | null>(null);
 
-  const { success, error } = useSelector((state: RootState) => state.auth);
 
-  // Show snackbar based on Redux feedback
-  useEffect(() => {
-    if (success) {
-      setSnackbar({ message: success, severity: "success" });
-      dispatch(setSuccess(null));
-      setTimeout(() => navigate("/login"), 2000);
-    } else if (error) {
-      setSnackbar({ message: error, severity: "error" });
-      dispatch(setError(null));
-    }
-  }, [success, error, dispatch, navigate]);
+  const { message, error } = useSelector((state: RootState) => state.auth);
+
+
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setSnackbar({ message: "Passwords do not match", severity: "error" });
+      setSnackBar({ message: "Passwords do not match", severity: "error" });
       return;
     }
 
@@ -56,7 +53,9 @@ const SetPassword: React.FC = () => {
         { token, password }
       );
 
-      dispatch(setSuccess(response.data.message));
+      dispatch(setMessage(response.data.message));
+      setTimeout(() => navigate("/login"), 2000);
+
     } catch (err: any) {
       dispatch(
         setError(err.response?.data?.message || "Failed to set password")

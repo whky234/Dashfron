@@ -2,21 +2,25 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Alert,
-  TextField,
   Button,
   CircularProgress,
   Grid,
   // useMediaQuery,
   // useTheme,
-  Snackbar,
+
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
 import { useNavigate, useParams } from "react-router-dom";
 import { addproduct, clearMessages, editproduct } from "../../stores/features/productslice";
+import PaperWrapper from "./paper";
+import Whitetextfield from "./whiteTextfield";
+import Handlemessages from "../../hooks/Handlemessage";
 
-const ProductForm: React.FC = () => {
+interface AddProductprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+const ProductForm: React.FC<AddProductprops> = ({setSnackBar}) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -24,9 +28,7 @@ const ProductForm: React.FC = () => {
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-      const [snackbarMessage, setSnackbarMessage] = useState("");
-      const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+    
 
   const { loading, error, products,message } = useSelector((state: RootState) => state.product);
   const existingProduct = id ? products.find((p) => p._id === id) : null;
@@ -56,19 +58,13 @@ const ProductForm: React.FC = () => {
     }
   }, [existingProduct]);
 
-  useEffect(()=>{
- if (message) {
-      setSnackbarMessage(message);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-      dispatch(clearMessages());
-    } else if (error) {
-      setSnackbarMessage(error);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      dispatch(clearMessages());
-    }
-  },[error,message,dispatch])
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
 
   const handlechange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
@@ -120,20 +116,18 @@ const ProductForm: React.FC = () => {
     }
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
+ 
 
 
   return (
-    <Box
+    <PaperWrapper
       sx={{
         maxWidth: 600,
         mx: "auto",
         p: 3,
         boxShadow: 3,
         borderRadius: 2,
-        bgcolor: "#fafafa",
+        
         mb:13
       }}
     >
@@ -145,7 +139,7 @@ const ProductForm: React.FC = () => {
       <form onSubmit={handlesubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
+            <Whitetextfield
               fullWidth
               label="Product Name"
               name="name"
@@ -156,7 +150,7 @@ const ProductForm: React.FC = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <Whitetextfield
               fullWidth
               label="Description"
               name="description"
@@ -182,7 +176,7 @@ const ProductForm: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <Whitetextfield
               fullWidth
               label="Price"
               name="price"
@@ -195,7 +189,7 @@ const ProductForm: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <Whitetextfield
               fullWidth
               label="Stock"
               name="stock"
@@ -224,7 +218,7 @@ const ProductForm: React.FC = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <Whitetextfield
               fullWidth
               label="Category"
               name="category"
@@ -248,21 +242,8 @@ const ProductForm: React.FC = () => {
         </Grid>
       </form>
 
-      <Snackbar
-              open={snackbarOpen}
-              autoHideDuration={3000}
-              onClose={handleSnackbarClose}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert
-                onClose={handleSnackbarClose}
-                severity={snackbarSeverity}
-                sx={{ width: "100%" }}
-              >
-                {snackbarMessage}
-              </Alert>
-            </Snackbar>
-    </Box>
+      
+    </PaperWrapper>
   );
 };
 

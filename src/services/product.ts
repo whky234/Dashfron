@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Product } from "../Types/Product";
-// const Api_Url="http://localhost:3000/api/product";
+const Api_Url="http://localhost:3000/api/product";
 
-const Api_Url = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/product";
+// const Api_Url = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/product";
 
 export const getproduct=async()=>{
 return await axios.get(`${Api_Url}/getProduct`,{    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

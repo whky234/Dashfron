@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-import { Box, Theme, useMediaQuery } from "@mui/material";
+import { Box, Theme, useMediaQuery, useTheme } from "@mui/material";
 
 // Auth Components
 import { Login } from "../Components/Auth/Login";
@@ -26,14 +26,19 @@ import Product from "../Pages/user/Products";
 import Services from "../Pages/user/service";
 import Profile from "../Pages/admin/Profile";
 
-export const AuthRoutes: React.FC = () => {
+interface Authtprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+
+export const AuthRoutes: React.FC<Authtprops> = ({setSnackBar }) => {
+  
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/set-password" element={<SetPassword />} />
+      <Route path="/" element={<Login setSnackBar={setSnackBar} />} />
+      <Route path="/login" element={<Login setSnackBar={setSnackBar} />} />
+      <Route path="/register" element={<Register setSnackBar={setSnackBar} />} />
+      <Route path="/set-password" element={<SetPassword setSnackBar={setSnackBar} />} />
 
       {/* Admin Routes (Protected) */}
       <Route path="/admin" element={<AuthGuard role="admin" />}>
@@ -41,15 +46,15 @@ export const AuthRoutes: React.FC = () => {
           <Route index element={<Navigate to="analytics" replace />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Setting />} />
-          <Route path="profile" element={<Profile/>} />
+          <Route path="profile" element={<Profile setSnackBar={setSnackBar}/>} />
 
-          <Route path="users" element={<UserManagement />} />
-          <Route path="users/add" element={<AddUser />} />
-          <Route path="users/edit/:id" element={<AddUser />} />
+          <Route path="users" element={<UserManagement setSnackBar={setSnackBar} />} />
+          <Route path="users/add" element={<AddUser  setSnackBar={setSnackBar}/>} />
+          <Route path="users/edit/:id" element={<AddUser setSnackBar={setSnackBar} />} />
 
-          <Route path="products" element={<AdminProductList />} />
-          <Route path="products/add" element={<AddProduct />} />
-          <Route path="products/edit/:id" element={<AddProduct />} />
+          <Route path="products" element={<AdminProductList setSnackBar={setSnackBar}/>} />
+          <Route path="products/add" element={<AddProduct  setSnackBar={setSnackBar}/>} />
+          <Route path="products/edit/:id" element={<AddProduct setSnackBar={setSnackBar} />} />
         </Route>
       </Route>
 
@@ -66,11 +71,13 @@ export const AuthRoutes: React.FC = () => {
 };
 
 const AdminLayout: React.FC = () => {
+  const theme=useTheme()
+
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
   return (
-    <Box sx={{  display: "flex",  // ✅ Prevent horizontal scroll
+    <Box sx={{  display: "flex", backgroundColor:theme.palette.background.default
     }}>
       {/* Header */}
       <Header onMenuClick={() => setOpen(true)} />

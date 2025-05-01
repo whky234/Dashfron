@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     navigate("/admin/profile");
   };
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: "#1E293B" }}>
+    <AppBar position="fixed" sx={{ backgroundColor: "#222831" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left side: Menu + Title */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -92,6 +92,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               />
             </IconButton>
 
+     
+
             <Menu
               anchorEl={anchorEl}
               open={menuOpen}
@@ -104,6 +106,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   overflow: "visible",
                   borderRadius: 2,
                   filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.1))",
+                  backgroundColor: "#222831", // Dark background
+                  color: "#EEEEEE",   
                 },
               }}
               transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -113,29 +117,29 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 <Typography variant="subtitle1" fontWeight="bold">
                   {user.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" >
                   {user.email}
                 </Typography>
               </Box>
 
-              <Divider />
+              <Divider  sx={{backgroundColor:'white'}}/>
 
               <MenuItem onClick={handlesetting}>
-                <ListItemIcon>
+                <ListItemIcon  sx={{color:'white'}} >
                   <SettingsIcon fontSize="small" />
                 </ListItemIcon>
                 Settings
               </MenuItem>
 
               <MenuItem onClick={handleprofile}>
-                <ListItemIcon>
+                <ListItemIcon  sx={{color:'white'}}>
                   <PersonIcon fontSize="small" />
                 </ListItemIcon>
                 Profile
               </MenuItem>
 
               <MenuItem onClick={handleLogout}>
-                <ListItemIcon>
+                <ListItemIcon  sx={{color:'white'}}>
                   <LogoutIcon fontSize="small" />
                 </ListItemIcon>
                 Sign out

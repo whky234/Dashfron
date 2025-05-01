@@ -9,9 +9,10 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import {  Typography, Paper } from "@mui/material";
+import {  Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../stores/store";
+import PaperWrapper from "./paper";
 
 const UserStatsChart: React.FC = () => {
   const { users } = useSelector((state: RootState) => state.userManagement);
@@ -25,7 +26,7 @@ const UserStatsChart: React.FC = () => {
   }, [users]);
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+    <PaperWrapper >
       <Typography variant="h6" gutterBottom fontWeight="bold">
         User Activity Overview
       </Typography>
@@ -44,7 +45,7 @@ const UserStatsChart: React.FC = () => {
           <Bar dataKey="Pending" fill="#ff9800" radius={[5, 5, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </Paper>
+    </PaperWrapper>
   );
 };
 

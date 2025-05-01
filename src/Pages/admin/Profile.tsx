@@ -4,33 +4,36 @@ import {
   Button,
   Container,
   Grid,
-  Snackbar,
-  TextField,
+  
   Typography,
-  Alert,
+ 
   CircularProgress,
   MenuItem,
-  Paper,
   Avatar,
   Divider,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../stores/store";
 import {
+  clearMessages,
   fetchProfile,
   saveProfile,
   selectProfile,
 } from "../../stores/features/profileslice";
 import { Profile } from "../../services/profile";
+import PaperWrapper from "./paper";
+import Whitetextfield from "./whiteTextfield";
+import Handlemessages from "../../hooks/Handlemessage";
 
-const ProfileForm: React.FC = () => {
+interface Profileprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+
+const ProfileForm: React.FC<Profileprops> = ({setSnackBar}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { profile, loading } = useSelector(selectProfile);
+  const { profile, loading,message,error } = useSelector(selectProfile);
 
-  const [snackbar, setSnackbar] = useState<{
-    message: string;
-    severity: "success" | "error";
-  } | null>(null);
+  
 
   const [formData, setFormData] = useState<Profile>({
     username: "",
@@ -39,7 +42,7 @@ const ProfileForm: React.FC = () => {
     bio: "",
     location: "",
     dateOfBirth: "",
-    gender: undefined,
+    gender: "", // changed from undefined to ""
   });
   
 
@@ -54,14 +57,22 @@ const ProfileForm: React.FC = () => {
         dateOfBirth: profile.dateOfBirth
           ? profile.dateOfBirth.slice(0, 10)
           : "",
-        gender: profile.gender || undefined,
-      });
+          gender: profile.gender || "", // also set to "" instead of undefined
+        });
     }
   }, [profile]);
 
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
+
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
@@ -80,32 +91,21 @@ const ProfileForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const result = await dispatch(saveProfile({ profile: formData }));
+   await dispatch(saveProfile({ profile: formData }));
 
-    if (saveProfile.fulfilled.match(result)) {
-      setSnackbar({ message: result.payload.message, severity: "success" });
-    } else {
-      setSnackbar({ message: result.payload as string, severity: "error" });
-    }
+    
 
     dispatch(fetchProfile());
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 2 }}>
-      <Typography
-        variant="h4"
-        sx={{ textAlign: "left" }}
-        fontWeight={600}
-        gutterBottom
-      >
-        Account
-      </Typography>
+    <Container maxWidth="lg" sx={{ mt: 0 }}>
+     
       <Grid container spacing={3}>
   {/* LEFT PROFILE CARD */}
   <Grid item xs={12} md={4}>
-    <Paper
-      elevation={3}
+    <PaperWrapper
+     
       sx={{
         p: 4,
         display: "flex",
@@ -122,10 +122,10 @@ const ProfileForm: React.FC = () => {
       <Typography variant="h6" fontWeight={600}>
         {formData.username || "Your Name"}
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2">
         {formData.location || "Location"}
       </Typography>
-      <Divider sx={{ width: "100%", my: 2 }} />
+      <Divider sx={{ width: "100%", my: 2, backgroundColor:'white' }} />
       <Button variant="outlined" size="small" component="label">
         Upload picture
         <input
@@ -136,80 +136,85 @@ const ProfileForm: React.FC = () => {
           onChange={handleChange}
         />
       </Button>
-    </Paper>
+    </PaperWrapper>
   </Grid>
 
   {/* RIGHT PROFILE FORM */}
   <Grid item xs={12} md={8}>
-    <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+    <PaperWrapper sx={{ p: 4, borderRadius: 3 }}>
       <Typography variant="h6" fontWeight={600} gutterBottom>
         {profile ? "Edit Profile" : "Create Profile"}
       </Typography>
-      <Typography variant="body2" color="text.secondary" gutterBottom>
+      <Typography variant="body2"  gutterBottom>
         Update your personal information below
       </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <Divider sx={{ mb: 3  ,backgroundColor:'white'}} />
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          <TextField
+          <Whitetextfield
             label="Username"
             name="username"
             fullWidth
             value={formData.username}
             onChange={handleChange}
+
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
+          <Whitetextfield
             label="Date of Birth"
             name="dateOfBirth"
             type="date"
             fullWidth
             value={formData.dateOfBirth}
             onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-          />
+            
+            />
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
+          <Whitetextfield
             select
             name="gender"
             label="Gender"
             fullWidth
             value={formData.gender}
             onChange={handleChange}
+            
+
           >
             <MenuItem value="male">Male</MenuItem>
             <MenuItem value="female">Female</MenuItem>
             <MenuItem value="other">Other</MenuItem>
-          </TextField>
+          </Whitetextfield>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
+          <Whitetextfield
             name="phone"
             label="Phone"
             fullWidth
             value={formData.phone}
             onChange={handleChange}
+
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
+          <Whitetextfield
             name="location"
             label="Location"
             fullWidth
             value={formData.location}
             onChange={handleChange}
+
           />
         </Grid>
 
         <Grid item xs={12}>
-          <TextField
+          <Whitetextfield
             name="bio"
             label="Bio"
             fullWidth
@@ -217,11 +222,12 @@ const ProfileForm: React.FC = () => {
             rows={3}
             value={formData.bio}
             onChange={handleChange}
+
           />
         </Grid>
       </Grid>
 
-      <Divider sx={{ mt: 4, mb: 2 }} />
+      <Divider sx={{ mt: 4, mb: 2 ,backgroundColor:'white'}} />
 
       <Box display="flex" justifyContent="flex-end">
         <Button
@@ -231,28 +237,18 @@ const ProfileForm: React.FC = () => {
           disabled={loading}
           sx={{ textTransform: "none", borderRadius: 2, minWidth: 140 }}
         >
-          {loading ? <CircularProgress size={22} color="inherit" /> : "Save Profile"}
+          {loading ? <CircularProgress size={22} color="primary" /> : "Save Profile"}
         </Button>
       </Box>
-    </Paper>
+    </PaperWrapper>
   </Grid>
 </Grid>
-      <Snackbar
-        open={!!snackbar}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar(null)}
-          severity={snackbar?.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar?.message}
-        </Alert>
-      </Snackbar>
+     
     </Container>
   );
 };
 
 export default ProfileForm;
+
+
+

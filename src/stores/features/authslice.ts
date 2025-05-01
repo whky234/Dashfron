@@ -1,17 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isTokenExpired } from "../../utils/tokenutils";
-import { GetCurrentUser, login, newpass, register } from "./auththunk";
+import { login, newpass, register } from "./auththunk";
 
 interface AuthState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  user: any;
+  user: any; // eslint-disable-next-line @typescript-eslint/no-explicit-any
   token: string | null;
   loading: boolean;
   error: string | null;
-  success: string | null;
+  message: string | null;
 }
 
-// Safely parse localStorage data
 const getLocalStorageUser = () => {
   const user = localStorage.getItem("user");
   const token = localStorage.getItem("token");
@@ -34,7 +33,7 @@ const initialState: AuthState = {
       : null,
   loading: false,
   error: null,
-  success: null,
+  message: null,
 };
 
 const authSlice = createSlice({
@@ -67,14 +66,18 @@ const authSlice = createSlice({
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
+    clearMessages: (state) => {
+      state.error = null;
+      state.message = null;
+      state.loading=false;
     },
-    setError: (state, action: PayloadAction<string | null>) => {
+    setMessage: (state, action: PayloadAction<string>) => {
+      state.message = action.payload;
+      state.error = null;
+    },
+    setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
-    },
-    setSuccess: (state, action: PayloadAction<string | null>) => {
-      state.success = action.payload;
+      state.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -83,90 +86,50 @@ const authSlice = createSlice({
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.success = null;
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = {
-          _id: action.payload._id,
-          name: action.payload.name,
-          email: action.payload.email,
-          role: action.payload.role,
-        };
-        state.token = action.payload.token;
-        state.success = action.payload.message || "Registered successfully";
+        
+        state.message = action.payload.message || "Registration successful";
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.success = null;
       })
 
       // Login user
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.success = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = {
-          _id: action.payload._id,
-          name: action.payload.name,
-          email: action.payload.email,
-          role: action.payload.role,
-        };
-        state.token = action.payload.token;
-        state.success = action.payload.message || "Login successful";
+        const { _id, name, email, role, token } = action.payload.data;
+        state.user = { _id, name, email, role };
+        state.token = token;
+        state.message = action.payload.message || "Login successful";
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.success = null;
-      })
-
-      // Get Current User
-      .addCase(GetCurrentUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = null;
-      })
-      .addCase(GetCurrentUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = {
-          _id: action.payload._id,
-          name: action.payload.name,
-          email: action.payload.email,
-          role: action.payload.role,
-        };
-        state.token = action.payload.token;
-        state.success = action.payload.message || "User loaded successfully";
-      })
-      .addCase(GetCurrentUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.success = null;
       })
 
       // Update Password
       .addCase(newpass.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.success = null;
       })
       .addCase(newpass.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = action.payload.message || "Password updated successfully";
+        state.message = action.payload.message || "Password updated successfully";
       })
       .addCase(newpass.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.success = null;
       });
   },
 });
 
-export const { setCredentials, logout, setError, setLoading, setSuccess } =
-  authSlice.actions;
+export const { setCredentials, logout, clearMessages,setMessage,setError } = authSlice.actions;
 
 export default authSlice.reducer;

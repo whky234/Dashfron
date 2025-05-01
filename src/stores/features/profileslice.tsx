@@ -8,6 +8,7 @@ interface ProfileState {
   profile: Profile | null;
   loading: boolean;
   error: string | null;
+  message:string|null;
 }
 
 const initialState: ProfileState = {
@@ -15,6 +16,7 @@ const initialState: ProfileState = {
   profile: null,
   loading: false,
   error: null,
+  message:null
 };
 
 // Get user + profile
@@ -34,7 +36,12 @@ export const saveProfile = createAsyncThunk(
   'profile/update',
   async ({ profile }: { profile: Profile }, thunkAPI) => {
     try {
-      return await updateProfile(profile);
+      const response= await updateProfile(profile);
+
+      return{
+        data:response,
+        message:response.message
+      }
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Error updating profile');
     }
@@ -44,19 +51,19 @@ export const saveProfile = createAsyncThunk(
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
-  reducers: {
-    resetProfileState: (state) => {
-      state.profile = null;
-      state.error = null;
-      state.loading = false;
-    },
-  },
+  reducers:{
+    clearMessages: (state) => {
+        state.error = null;
+        state.message = null;
+    }
+},
   extraReducers: (builder) => {
     builder
       // Fetch
       .addCase(fetchProfile.pending, (state) => {
-        state.loading = true;
+        state.loading=true
         state.error = null;
+        state.message = null;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
@@ -70,12 +77,14 @@ const profileSlice = createSlice({
 
       // Update
       .addCase(saveProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loading=true
+            state.error = null;
+            state.message = null;
       })
       .addCase(saveProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.profile = action.payload;
+        state.message=action.payload.message
       })
       .addCase(saveProfile.rejected, (state, action) => {
         state.loading = false;
@@ -84,7 +93,7 @@ const profileSlice = createSlice({
   },
 });
 
-export const { resetProfileState } = profileSlice.actions;
+export const { clearMessages } = profileSlice.actions;
 export const selectProfile = (state: RootState) => state.profile;
 
 export default profileSlice.reducer;

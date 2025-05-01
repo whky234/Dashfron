@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,52 +7,51 @@ import {
   TextField,
   Button,
   CircularProgress,
-  Alert,
   Paper,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  Snackbar,
 } from "@mui/material";
 import { register } from "../../stores/features/auththunk";
 import { RootState, AppDispatch } from "../../stores/store";
-import { setError, setSuccess } from "../../stores/features/authslice";
+import Handlemessages from "../../hooks/Handlemessage";
+import { clearMessages } from "../../stores/features/authslice";
 
-export const Register: React.FC = () => {
+interface Registerprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+export const Register: React.FC<Registerprops> = ({setSnackBar}) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<string>("user");
 
-  const [snackbar, setSnackbar] = useState<{
-    message: string;
-    severity: "success" | "error";
-  } | null>(null);
-
+  
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, error, success } = useSelector(
+  const { loading, error, message } = useSelector(
     (state: RootState) => state.auth
   );
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await dispatch(register({ name, email, password, role }));
+    setTimeout(() => navigate("/login"), 2000);
+
   };
 
-  // 🔔 Handle success/error updates from Redux
-  useEffect(() => {
-    if (success) {
-      setSnackbar({ message: success, severity: "success" });
-      dispatch(setSuccess(null));
-      setTimeout(() => navigate("/login"), 2000);
-    } else if (error) {
-      setSnackbar({ message: error, severity: "error" });
-      dispatch(setError(null));
-    }
-  }, [success, error, dispatch, navigate]);
+  
 
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
   return (
     <Container maxWidth="sm">
       <Paper
@@ -128,20 +127,7 @@ export const Register: React.FC = () => {
         </form>
       </Paper>
 
-      <Snackbar
-        open={!!snackbar}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar(null)}
-          severity={snackbar?.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar?.message}
-        </Alert>
-      </Snackbar>
+      
     </Container>
   );
 };

@@ -3,23 +3,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
-  TextField,
   Button,
   Typography,
-  Paper,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
   Grid,
-  Alert,
-  Snackbar,
   CircularProgress,
 } from "@mui/material";
-import { Adduser, Edituser } from "../../stores/features/usermangement";
+import {
+  Adduser,
+  clearMessages,
+  Edituser,
+} from "../../stores/features/usermangement";
 import { RootState } from "../../stores/store";
+import PaperWrapper from "./paper";
+import Whitetextfield from "./whiteTextfield";
+import Handlemessages from "../../hooks/Handlemessage";
 
-const AddUser: React.FC = () => {
+interface Adduserprops {
+  setSnackBar: React.Dispatch<
+    React.SetStateAction<{
+      message: string;
+      severity: "success" | "error";
+    } | null>
+  >;
+}
+const AddUser: React.FC<Adduserprops> = ({ setSnackBar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -28,12 +39,10 @@ const AddUser: React.FC = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
   const [status, setStatus] = useState("active");
-  const [snackbar, setSnackbar] = useState<{
-    message: string;
-    severity: "success" | "error";
-  } | null>(null);
 
-  const { users,loading } = useSelector((state: RootState) => state.userManagement);
+  const { users, loading, message, error } = useSelector(
+    (state: RootState) => state.userManagement
+  );
   const existingUser = id ? users.find((user) => user._id === id) : null;
 
   useEffect(() => {
@@ -45,6 +54,15 @@ const AddUser: React.FC = () => {
     }
   }, [existingUser]);
 
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -53,11 +71,9 @@ const AddUser: React.FC = () => {
     }
 
     try {
-      let resultAction;
-
       if (id) {
         // Edit user
-        resultAction = await dispatch(
+        await dispatch(
           Edituser({
             id,
             userData: { name, email, role, status },
@@ -66,30 +82,15 @@ const AddUser: React.FC = () => {
         );
       } else {
         // Add user
-        resultAction = await dispatch(
+        await dispatch(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           Adduser({ name, email, role }) as any
         );
       }
 
-      if (
-        (id && Edituser.fulfilled.match(resultAction)) ||
-        (!id && Adduser.fulfilled.match(resultAction))
-      ) {
-        setSnackbar({
-          message: resultAction.payload.message,
-          severity: "success",
-        });
-
-        setTimeout(() => {
-          navigate("/admin/users");
-        }, 1500); // Delay navigation to allow Snackbar to show
-      } else {
-        setSnackbar({
-          message: resultAction.payload as string,
-          severity: "error",
-        });
-      }
+      setTimeout(() => {
+        navigate("/admin/users");
+      }, 1500); // Delay navigation to allow Snackbar to show
 
       setName("");
       setEmail("");
@@ -98,7 +99,7 @@ const AddUser: React.FC = () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     } catch (err: any) {
-      setSnackbar({ message: "An error occurred", severity: "error" });
+      //
     }
   };
 
@@ -111,14 +112,17 @@ const AddUser: React.FC = () => {
         minHeight: "70vh",
       }}
     >
-      <Paper elevation={3} sx={{ padding: 4, width: "100%", maxWidth: 600 }}>
-        <Typography variant="h5" align="center" gutterBottom>
+      <PaperWrapper
+        elevation={3}
+        sx={{ padding: 4, width: "100%", maxWidth: 600 }}
+      >
+        <Typography variant="h5" align="center" sx={{ mb: 3 }} gutterBottom>
           {id ? "Edit User" : "Add New User"}
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
+              <Whitetextfield
                 label="Name"
                 fullWidth
                 value={name}
@@ -127,7 +131,7 @@ const AddUser: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <Whitetextfield
                 label="Email"
                 type="email"
                 fullWidth
@@ -138,11 +142,14 @@ const AddUser: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth required>
-                <InputLabel id="role-label">Role</InputLabel>
+                <InputLabel id="role-label" sx={{ color: "white" }}>
+                  Role
+                </InputLabel>
                 <Select
                   labelId="role-label"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
+                  sx={{ color: "white" }}
                 >
                   <MenuItem value="user">User</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
@@ -151,11 +158,14 @@ const AddUser: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth required>
-                <InputLabel id="status-label">Status</InputLabel>
+                <InputLabel id="status-label" sx={{ color: "white" }}>
+                  Status
+                </InputLabel>
                 <Select
                   labelId="status-label"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
+                  sx={{ color: "white" }}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
@@ -180,21 +190,7 @@ const AddUser: React.FC = () => {
             </Grid>
           </Grid>
         </form>
-      </Paper>
-      <Snackbar
-        open={!!snackbar}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar(null)}
-          severity={snackbar?.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar?.message}
-        </Alert>
-      </Snackbar>
+      </PaperWrapper>
     </Box>
   );
 };

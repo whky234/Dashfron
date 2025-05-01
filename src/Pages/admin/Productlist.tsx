@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Typography,
   
-  // useTheme,
-  Snackbar,
-  Alert,
+ 
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -19,8 +16,12 @@ import { AppDispatch, RootState } from "../../stores/store";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "./confimation";
 import ReusableTable from "./reuseabletable";
+import Handlemessages from "../../hooks/Handlemessage";
 
-const AdminProductList: React.FC = () => {
+interface AdminProductListprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+const AdminProductList: React.FC<AdminProductListprops> = ({setSnackBar}) => {
   const dispatch = useDispatch<AppDispatch>();
   // const theme = useTheme();
   // const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -28,9 +29,7 @@ const AdminProductList: React.FC = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+ 
   const [opendeletedialog, setopendeletedialog] = useState(false);
   const [producttodelete, setproducttodelete] = useState<string | null>(null);
   const [searchterm, setsearchterm] = useState("");
@@ -39,23 +38,33 @@ const AdminProductList: React.FC = () => {
     (state: RootState) => state.product
   );
 
+
+  
+  
   useEffect(() => {
     dispatch(fetchproduct());
   }, [dispatch]);
+  
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
 
-  useEffect(() => {
-    if (message) {
-      setSnackbarMessage(message);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-      dispatch(clearMessages());
-    } else if (error) {
-      setSnackbarMessage(error);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      dispatch(clearMessages());
-    }
-  }, [message, error, dispatch]);
+
+  // useEffect(() => {
+  //   if (message) {
+  //     setSnackBar({ message: message, severity: 'success' });
+  //     dispatch(clearMessages());
+  //   } else if (error) {
+  //     setSnackBar({ message: error, severity: 'error' });
+  //     dispatch(clearMessages());
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [message, error, dispatch]);
+ 
 
   const filteredProducts = useMemo(() => {
     if (!searchterm.trim()) return products;
@@ -103,9 +112,7 @@ const AdminProductList: React.FC = () => {
     setproducttodelete(null);
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
+  
 
   const columns = [
     { label: "Image", field: "image",
@@ -131,7 +138,7 @@ const AdminProductList: React.FC = () => {
       render: (row: any) => `$${row.price?.toFixed(2)}`,
     },
     { label: "Quantity", field: "stock" },
-    { label: "UpdateAt", field: "stock" ,
+    { label: "UpdateAt", field: "updatedAt" ,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render:(row:any)=>`${new Date(row.updatedAt).toLocaleDateString()}`
     },
@@ -154,12 +161,10 @@ const AdminProductList: React.FC = () => {
 
   return (
     <Box sx={{ mb: 14 }}>
-      <Typography variant="h4" sx={{ mb: 4, textAlign: "left" }}>
-        Admin Product List
-      </Typography>
+     
 
       <ReusableTable
-        title="Products"
+        title="Products List"
         searchTerm={searchterm}
         setSearchTerm={setsearchterm}
         addLink="/admin/products/add"
@@ -178,21 +183,7 @@ const AdminProductList: React.FC = () => {
         actions={actions}
       />
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-
+     
       <ConfirmDialog
         open={opendeletedialog}
         title="Delete"

@@ -8,48 +8,42 @@ import {
   TextField,
   Button,
   CircularProgress,
-  Alert,
   Box,
   Paper,
-  Snackbar,
 } from "@mui/material";
 import { login } from "../../stores/features/auththunk";
-import {
-  setError,
-  setSuccess,
-} from "../../stores/features/authslice"; // ✅ Add this
-import { RootState, AppDispatch } from "../../stores/store";
 
-export const Login: React.FC = () => {
+import { RootState, AppDispatch } from "../../stores/store";
+import Handlemessages from "../../hooks/Handlemessage";
+import { clearMessages } from "../../stores/features/authslice";
+
+interface Loginprops{
+  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+}
+export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, error, success, user } = useSelector(
+  const { loading, error, message, user } = useSelector(
     (state: RootState) => state.auth
   );
 
-  const [snackbar, setSnackbar] = useState<{
-    message: string;
-    severity: "success" | "error";
-  } | null>(null);
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await dispatch(login({ email, password }));
   };
 
-  // 🔔 Show snackbar when success or error changes
-  useEffect(() => {
-    if (success) {
-      setSnackbar({ message: success, severity: "success" });
-      dispatch(setSuccess(null)); // reset success after showing it
-    } else if (error) {
-      setSnackbar({ message: error, severity: "error" });
-      dispatch(setError(null)); // reset error after showing it
-    }
-  }, [success, error, dispatch]);
+  Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
+  });
 
   // 🎯 Redirect if logged in
   useEffect(() => {
@@ -134,20 +128,7 @@ export const Login: React.FC = () => {
         </form>
       </Paper>
 
-      <Snackbar
-        open={!!snackbar?.message}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar(null)}
-          severity={snackbar?.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar?.message}
-        </Alert>
-      </Snackbar>
+      
     </Container>
   );
 };

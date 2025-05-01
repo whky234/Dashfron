@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Paper,
+
   Typography,
   Avatar,
   Box,
@@ -10,6 +10,7 @@ import {
   ArrowDropDown,
 } from "@mui/icons-material";
 import CountUp from "react-countup";
+import PaperWrapper from "./paper";
 
 interface StatCardProps {
   label: string;
@@ -30,11 +31,11 @@ const StatCard: React.FC<StatCardProps> = ({
   prefix = "",
   suffix = "",
 }) => {
+  
   const isPositive = diff !== undefined && diff >= 0;
 
   return (
-    <Paper
-      elevation={3}
+    <PaperWrapper
       sx={{
         p: 2,
         borderRadius: 3,
@@ -43,10 +44,11 @@ const StatCard: React.FC<StatCardProps> = ({
         display: "flex",
         flexDirection: "column",
         gap: 1.5,
+        
       }}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{color:'white'}}>
           {label.toUpperCase()}
         </Typography>
         <Avatar sx={{ bgcolor: color, width: 40, height: 40 }}>
@@ -83,7 +85,7 @@ const StatCard: React.FC<StatCardProps> = ({
           </Typography>
         </Box>
       )}
-    </Paper>
+    </PaperWrapper>
   );
 };
 
