@@ -80,7 +80,7 @@ const Setting: React.FC<Settingsprops> = ({setSnackBar}) => {
   };
 
   return (
-    <PaperWrapper  sx={{ maxWidth: 400, mx: "auto", p: 9 }}>
+    <PaperWrapper  sx={{ maxWidth: 500, mx: "auto", p: 13 }}>
       <Typography variant="h5" gutterBottom>
         🔐 Change Password
       </Typography>
