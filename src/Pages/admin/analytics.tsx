@@ -7,9 +7,11 @@ import {
   useMediaQuery,
   Divider,
 
-  Grid,
+ 
   IconButton,
 } from "@mui/material";
+import Grid from '@mui/material/Grid'; // preferred for TS accuracy
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
 import { Fetchuser } from "../../stores/features/usermangement";
@@ -26,9 +28,9 @@ import {
   Tooltip,
 } from "recharts";
 import { AttachMoney, People, Assignment } from "@mui/icons-material";
-import StatCard from "./Statcard";
-import ReusableTable from "./reuseabletable";
-import PaperWrapper from "./paper";
+import StatCard from "../../hooks/Statcard";
+import ReusableTable from "../../hooks/reuseabletable";
+import PaperWrapper from "../../hooks/paper";
 import { useNavigate } from "react-router-dom";
 
 const COLORS = ["#7B61FF", "#00B894", "#FFA726", "#FF6B6B", "#00C49F", "#FFBB28"];

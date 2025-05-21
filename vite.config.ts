@@ -1,9 +1,16 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from 'vitest/config';
 
-// https://vite.dev/config/
 export default defineConfig({
-  base: "./",
-
-  plugins: [react()],
-})
+ test: {
+    globals: true,
+    environment: 'jsdom',
+    coverage: {
+      provider: 'v8', // or 'c8'
+      reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      exclude: ['node_modules/', '.test.ts/','src/Types/**','**/*.test.tsx',       // test files
+        '**/*.d.ts', '**/*.config.ts','**/*.config.js','src/main.tsx',
+        'src/App.tsx','src/Context','src/Theme'    ],
+    },
+  },
+});

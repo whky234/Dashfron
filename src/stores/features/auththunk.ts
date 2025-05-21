@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginuser, registeruser, newpassword } from "../../services/authser";
+import { loginuser, registeruser, newpassword, setpassword } from "../../services/authser";
 import { setCredentials } from "./authslice";
 
 export const register = createAsyncThunk(
@@ -52,6 +53,24 @@ export const newpass = createAsyncThunk(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Password update failed");
+    }
+  }
+
+
+  
+);
+
+export const setNewPassword = createAsyncThunk(
+  'auth/setNewPassword',
+  async (userData: { token: string | null; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await setpassword(userData);
+      return {
+        data: response,
+        message: response.message,
+      };
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to set new password");
     }
   }
 );

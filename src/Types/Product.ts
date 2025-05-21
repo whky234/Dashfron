@@ -7,10 +7,10 @@ export interface Product{
     image:string,
     category:string,
     stock:number,
-    createBy:{
+    createBy?:{
         _id:string,
         name:string,
         email:string
     }
-    updatedAt:string
+    updatedAt?:string
 }

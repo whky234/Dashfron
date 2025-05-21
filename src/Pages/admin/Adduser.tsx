@@ -18,8 +18,8 @@ import {
   Edituser,
 } from "../../stores/features/usermangement";
 import { RootState } from "../../stores/store";
-import PaperWrapper from "./paper";
-import Whitetextfield from "./whiteTextfield";
+import PaperWrapper from "../../hooks/paper";
+import Whitetextfield from "../../hooks/whiteTextfield";
 import Handlemessages from "../../hooks/Handlemessage";
 
 interface Adduserprops {
@@ -128,6 +128,7 @@ const AddUser: React.FC<Adduserprops> = ({ setSnackBar }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                data-testid="textfield-Name" // <-- Add this line
               />
             </Grid>
             <Grid item xs={12}>
@@ -138,6 +139,7 @@ const AddUser: React.FC<Adduserprops> = ({ setSnackBar }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                data-testid="textfield-email" // <-- Add this line
               />
             </Grid>
             <Grid item xs={12}>
@@ -146,10 +148,10 @@ const AddUser: React.FC<Adduserprops> = ({ setSnackBar }) => {
                   Role
                 </InputLabel>
                 <Select
-                  labelId="role-label"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   sx={{ color: "white" }}
+  data-testid="textfield-role"
                 >
                   <MenuItem value="user">User</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
@@ -162,10 +164,11 @@ const AddUser: React.FC<Adduserprops> = ({ setSnackBar }) => {
                   Status
                 </InputLabel>
                 <Select
-                  labelId="status-label"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                   sx={{ color: "white" }}
+                  data-testid="textfield-status"
+
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>

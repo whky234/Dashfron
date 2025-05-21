@@ -21,8 +21,8 @@ import {
   selectProfile,
 } from "../../stores/features/profileslice";
 import { Profile } from "../../services/profile";
-import PaperWrapper from "./paper";
-import Whitetextfield from "./whiteTextfield";
+import PaperWrapper from "../../hooks/paper";
+import Whitetextfield from "../../hooks/whiteTextfield";
 import Handlemessages from "../../hooks/Handlemessage";
 
 interface Profileprops{
@@ -60,7 +60,7 @@ const ProfileForm: React.FC<Profileprops> = ({setSnackBar}) => {
           gender: profile.gender || "", // also set to "" instead of undefined
         });
     }
-  }, [profile]);
+  }, []);
 
   useEffect(() => {
     dispatch(fetchProfile());
@@ -130,6 +130,7 @@ const ProfileForm: React.FC<Profileprops> = ({setSnackBar}) => {
         Upload picture
         <input
           hidden
+          data-testid="textfield-profilePicture"
           type="file"
           name="profilePicture"
           accept="image/*"

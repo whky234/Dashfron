@@ -39,7 +39,7 @@ export const Register: React.FC<Registerprops> = ({setSnackBar}) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await dispatch(register({ name, email, password, role }));
-    setTimeout(() => navigate("/login"), 2000);
+     navigate("/login");
 
   };
 

@@ -12,10 +12,13 @@ import {
 } from "@mui/material";
 import { fetchproduct } from "../../stores/features/productslice";
 import { AppDispatch, RootState } from "../../stores/store";
+import { useThemeContext } from "../../Context/usecontext";
 
 const Product: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading, error } = useSelector((state: RootState) => state.product);
+    const {theme}=useThemeContext()
+  
 
   useEffect(() => {
     dispatch(fetchproduct());
@@ -25,7 +28,7 @@ const Product: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ px: 3, py: 5, backgroundColor: "#f5f5f5" }}>
+    <Box sx={{ px: { xs: 2, sm: 3, md: 5 }, py: 5, backgroundColor:theme==="dark"?"black":"#fff" }}>
       <Typography
         variant="h4"
         sx={{
@@ -34,12 +37,13 @@ const Product: React.FC = () => {
           fontWeight: "bold",
           color: "#b71c1c",
           textTransform: "uppercase",
+          fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
         }}
       >
         A Million Sparkles for Just One You
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product._id}>
             <Card
@@ -48,9 +52,9 @@ const Product: React.FC = () => {
                 borderRadius: 2,
                 transition: "transform 0.3s",
                 "&:hover": {
-                  transform: "scale(1.03)",
+                  transform: "scale(1.05)",
                 },
-                backgroundColor: "#fff",
+                backgroundColor:theme==="dark"?"#444":"#fff",
               }}
             >
               <CardMedia
@@ -60,33 +64,40 @@ const Product: React.FC = () => {
                 alt={product.name}
                 sx={{ objectFit: "cover" }}
               />
-              <CardContent sx={{ textAlign: "center" }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  {product.name}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 1, mb: 2 }}
-                >
-                  {product.description || "Elegant diamond-studded design"}
-                </Typography>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#d32f2f",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    px: 4,
-                    borderRadius: 0,
-                    "&:hover": {
-                      backgroundColor: "#b71c1c",
-                    },
-                  }}
-                >
-                  ${product.price}
-                </Button>
-              </CardContent>
+             <CardContent sx={{ textAlign: "center",color:theme==="dark"?"white":"black",
+ }}>
+  <Typography
+    variant="h6"
+    sx={{ fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" } }}
+  >
+    {product.name}
+  </Typography>
+
+  {/* Size Selection */}
+  
+
+  {/* Price and Add to Cart */}
+  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 3 }}>
+    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#000" }}>
+      ${product.price}
+    </Typography>
+    <Button
+      variant="contained"
+      sx={{
+        backgroundColor: "#000",
+        fontWeight: "bold",
+        textTransform: "none",
+        px: 2,
+        py: 1,
+        fontSize: "0.85rem",
+        "&:hover": { backgroundColor: "#333" },
+      }}
+    >
+      🛒 Add to cart
+    </Button>
+  </Box>
+</CardContent>
+
             </Card>
           </Grid>
         ))}

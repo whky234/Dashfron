@@ -1,8 +1,8 @@
 import axios from "axios";
 import { isAdmin } from "./IsAdmin";
 
-const Api_Url = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth";
-// const Api_Url = "http://localhost:3000/api/auth";
+// const Api_Url = "https://dashboardproducts-ff5e09c8bf17.herokuapp.com/api/auth";
+const Api_Url = "http://localhost:3000/api/auth";
 
 
 export const registeruser = async (userData: {
@@ -33,13 +33,6 @@ export const newpassword = async (credentials: {
   return response.data;
 };
 
-export const getCurrent = async () => {
-  const response = await axios.get(`${Api_Url}/current`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  });
-
-  return response.data;
-};
 
 export const getusers = async () => {
   if (!isAdmin) {
@@ -119,5 +112,15 @@ export const changestatus = async (id: string, status: string) => {
     }
   );
 
-  return response.data;
+  return response?.data;
+
+
+  
+};
+
+export const setpassword = async (data: { token: string | null; password: string }) => {
+  const response = await axios.post(`${Api_Url}/set-password`, data, {
+  
+  });
+  return response?.data;
 };

@@ -16,6 +16,9 @@ const initialState:productstate={
     message:null
 }
 
+
+
+
 export const fetchproduct = createAsyncThunk('products/fetchall', async (_, { rejectWithValue }) => {
     try {
         const response = await getproduct();
@@ -87,6 +90,7 @@ const Productslice=createSlice({
         clearMessages: (state) => {
             state.error = null;
             state.message = null;
+            state.loading = false;
         }
     },
     extraReducers:(builder)=>{

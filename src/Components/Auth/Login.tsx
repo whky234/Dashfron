@@ -17,10 +17,12 @@ import { RootState, AppDispatch } from "../../stores/store";
 import Handlemessages from "../../hooks/Handlemessage";
 import { clearMessages } from "../../stores/features/authslice";
 
-interface Loginprops{
-  setSnackBar:React.Dispatch<React.SetStateAction<{message:string,severity:'success'|'error'}|null>>;
+interface Loginprops {
+  setSnackBar: React.Dispatch<
+    React.SetStateAction<{ message: string; severity: "success" | "error" } | null>
+  >;
 }
-export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
+export const Login: React.FC<Loginprops> = ({ setSnackBar }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -29,8 +31,6 @@ export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
   const { loading, error, message, user } = useSelector(
     (state: RootState) => state.auth
   );
-
- 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +45,6 @@ export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
     dispatch,
   });
 
-  // 🎯 Redirect if logged in
   useEffect(() => {
     if (user) {
       if (user.role === "admin") {
@@ -73,7 +72,7 @@ export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
           Please login to your account
         </Typography>
 
-        <form onSubmit={handleSubmit}>
+        <form role="form" onSubmit={handleSubmit}>
           <TextField
             label="Email"
             type="email"
@@ -127,8 +126,6 @@ export const Login: React.FC<Loginprops> = ({setSnackBar}) => {
           </Box>
         </form>
       </Paper>
-
-      
     </Container>
   );
 };

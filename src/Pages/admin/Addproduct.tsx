@@ -13,8 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
 import { useNavigate, useParams } from "react-router-dom";
 import { addproduct, clearMessages, editproduct } from "../../stores/features/productslice";
-import PaperWrapper from "./paper";
-import Whitetextfield from "./whiteTextfield";
+import PaperWrapper from "../../hooks/paper";
+import Whitetextfield from "../../hooks/whiteTextfield";
 import Handlemessages from "../../hooks/Handlemessage";
 
 interface AddProductprops{
@@ -204,7 +204,7 @@ const ProductForm: React.FC<AddProductprops> = ({setSnackBar}) => {
           <Grid item xs={12}>
             <Button variant="outlined" component="label" fullWidth>
               Upload Image
-              <input type="file" name="image" hidden accept="image/*" onChange={handlechange} />
+              <input type="file" name="image" hidden accept="image/*" onChange={handlechange} data-testid="textfield-image" />
             </Button>
             {formdata.image && (
               <Box mt={2} sx={{ textAlign: "center" }}>
@@ -236,7 +236,7 @@ const ProductForm: React.FC<AddProductprops> = ({setSnackBar}) => {
               fullWidth
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : id ? "Update Product" : "Add Product"}
+              {loading ? <CircularProgress size={24}  data-testid="circular-progress"/> : id ? "Update Product" : "Add Product"}
             </Button>
           </Grid>
         </Grid>

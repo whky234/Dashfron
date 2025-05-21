@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isTokenExpired } from "../../utils/tokenutils";
-import { login, newpass, register } from "./auththunk";
+import { login, newpass, register, setNewPassword } from "./auththunk";
 
 interface AuthState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,6 +12,8 @@ interface AuthState {
 }
 
 const getLocalStorageUser = () => {
+  if (typeof localStorage === "undefined") return null;
+
   const user = localStorage.getItem("user");
   const token = localStorage.getItem("token");
 
@@ -27,6 +29,7 @@ const getLocalStorageUser = () => {
 const initialState: AuthState = {
   user: getLocalStorageUser(),
   token:
+    typeof localStorage !== "undefined" &&
     localStorage.getItem("token") &&
     !isTokenExpired(localStorage.getItem("token")!)
       ? localStorage.getItem("token")
@@ -69,7 +72,7 @@ const authSlice = createSlice({
     clearMessages: (state) => {
       state.error = null;
       state.message = null;
-      state.loading=false;
+      state.loading = false;
     },
     setMessage: (state, action: PayloadAction<string>) => {
       state.message = action.payload;
@@ -89,7 +92,7 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        
+
         state.message = action.payload.message || "Registration successful";
       })
       .addCase(register.rejected, (state, action) => {
@@ -121,15 +124,31 @@ const authSlice = createSlice({
       })
       .addCase(newpass.fulfilled, (state, action) => {
         state.loading = false;
-        state.message = action.payload.message || "Password updated successfully";
+        state.message =
+          action.payload.message || "Password updated successfully";
       })
       .addCase(newpass.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Set New Password (e.g., for forgot password flow)
+      .addCase(setNewPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setNewPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message || "Password set successfully";
+      })
+      .addCase(setNewPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export const { setCredentials, logout, clearMessages,setMessage,setError } = authSlice.actions;
+export const { setCredentials, logout, clearMessages, setMessage, setError } =
+  authSlice.actions;
 
 export default authSlice.reducer;

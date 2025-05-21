@@ -12,7 +12,7 @@ import {
 import {  Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../stores/store";
-import PaperWrapper from "./paper";
+import PaperWrapper from "../../hooks/paper";
 
 const UserStatsChart: React.FC = () => {
   const { users } = useSelector((state: RootState) => state.userManagement);

@@ -1,16 +1,9 @@
 import React from "react";
-import {
 
-  Typography,
-  Avatar,
-  Box,
-} from "@mui/material";
-import {
-  ArrowDropUp,
-  ArrowDropDown,
-} from "@mui/icons-material";
-import CountUp from "react-countup";
 import PaperWrapper from "./paper";
+import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
+import { Box, Typography, Avatar } from "@mui/material";
+import CountUp from "react-countup";
 
 interface StatCardProps {
   label: string;

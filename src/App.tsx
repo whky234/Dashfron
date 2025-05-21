@@ -1,12 +1,13 @@
+import React from 'react'; // ✅ ADD THIS
 import { Provider } from 'react-redux';
 import './App.css';
-import {  store } from './stores/store';
+import { store } from './stores/store';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthRoutes } from './Routes/AuthRoutes';
-import { ThemeProvider } from '@emotion/react';
-import theme from './Theme/theme';
+
 import { useState } from 'react';
 import { Snackbar, Alert } from '@mui/material';
+import { ThemeProvider } from './Context/usecontext';
 
 function App() {
  
@@ -15,7 +16,7 @@ function App() {
     setSnackbar(null);
   };
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider >
     <Provider store={store}>
      
       <BrowserRouter> {/* Ensure Router is here */}
@@ -42,5 +43,7 @@ function App() {
     </ThemeProvider>
   );
 }
+
+
 
 export default App;

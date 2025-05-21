@@ -23,8 +23,8 @@ import {
   Fetchuser,
 } from "../../stores/features/usermangement";
 import {  useNavigate } from "react-router-dom";
-import ConfirmDialog from "./confimation";
-import ReusableTable from "./reuseabletable";
+import ConfirmDialog from "../../hooks/confimation";
+import ReusableTable from "../../hooks/reuseabletable";
 import Handlemessages from "../../hooks/Handlemessage";
 
 interface userlistListprops{

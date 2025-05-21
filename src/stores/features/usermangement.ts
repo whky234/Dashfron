@@ -119,6 +119,7 @@ const UserManagementreducer = createSlice({
     clearMessages: (state) => {
       state.error = null;
       state.message = null;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {

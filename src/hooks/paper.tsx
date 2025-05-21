@@ -1,4 +1,5 @@
 import { Paper, PaperProps } from "@mui/material";
+import React from 'react'; // ✅ ADD THIS
 
 type PaperWrapperProps = PaperProps & {
   children: React.ReactNode;

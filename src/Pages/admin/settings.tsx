@@ -10,17 +10,34 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../stores/store";
 import { newpass } from "../../stores/features/auththunk";
-import PaperWrapper from "./paper";
-import Whitetextfield from "./whiteTextfield";
-
-const Setting: React.FC = () => {
+import PaperWrapper from "../../hooks/paper";
+import Whitetextfield from "../../hooks/whiteTextfield";
+import Handlemessages from "../../hooks/Handlemessage";
+import { clearMessages } from "../../stores/features/authslice";
+  
+interface Settingsprops {
+  setSnackBar: React.Dispatch<
+    React.SetStateAction<{ message: string; severity: "success" | "error" } | null>
+  >;
+}
+const Setting: React.FC<Settingsprops> = ({setSnackBar}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error, message, user } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const [form, setForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+  });
+
+    Handlemessages({
+    message,
+    error,
+    clearMessageAction: clearMessages,
+    setSnackBar,
+    dispatch,
   });
 
   const [successMessage, setSuccessMessage] = useState("");
@@ -34,7 +51,7 @@ const Setting: React.FC = () => {
     e.preventDefault();
 
     if (form.newPassword !== form.confirmPassword) {
-      setSuccessMessage("");
+      setSuccessMessage("paswords do not match");
       setOpenSnackbar(true);
       return;
     }
@@ -46,7 +63,6 @@ const Setting: React.FC = () => {
           newPassword: form.newPassword,
         })
       ).unwrap();
-      setSuccessMessage("Password updated successfully!");
       setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch {
       setSuccessMessage("");
